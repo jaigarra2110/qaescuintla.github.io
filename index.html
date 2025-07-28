@@ -1,83 +1,284 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Formulario de Prueba - QA Funcional</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        form { max-width: 400px; }
-        input, select { width: 100%; margin-bottom: 10px; padding: 8px; }
-        label { font-weight: bold; }
-        .error { color: red; margin-bottom: 10px; }
-        .success { color: green; margin-top: 20px; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Simulador QA | Escenarios</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <h2>Formulario de Pruebas Funcionales</h2>
-    <form id="test-form">
-        <label>Usuario:</label>
-        <input type="text" id="usuario" required>
+<section class="section">
+  <div class="container">
+    <h1 class="title has-text-centered">Simulador de Escenarios QA</h1>
+    <div id="app" class="box mt-4">
+      <h2 id="escenario-titulo" class="subtitle is-4 mb-2">Escenario</h2>
+      <div id="reglas" class="content mb-3"></div>
+      <form id="formulario" class="mb-3"></form>
+      <button class="button is-success is-fullwidth" onclick="validarFormulario()"> Validar</button>
+      <div id="resultado" class="notification is-light mt-3"></div>
+      <div id="contenedor-tecnica" class="mt-4"></div>
+      <button class="button is-warning is-fullwidth mt-4" onclick="generarEscenario()">Nuevo Escenario</button>
+    </div>
+  </div>
+</section>
+<footer class="footer">
+  <div class="content has-text-centered">
+    <p><strong>Simulador QA</strong> UMG - Escuintla.<br>Curso Aseguramiento de la calidad del Software<strong>Ing. Jairon García</strong></p>
+  </div>
+</footer>
 
-        <label>Contraseña:</label>
-        <input type="password" id="password" required>
+<script>
+const escenarios = [
+  {
+    "titulo": "Registro con Edad y Pa\u00eds",
+    "reglas": [
+      "Edad entre 18 y 60",
+      "Pa\u00eds obligatorio"
+    ],
+    "campos": [
+      {
+        "label": "Edad",
+        "tipo": "number",
+        "id": "edad",
+        "regla": "Edad debe ser entre 18 y 60"
+      },
+      {
+        "label": "Pa\u00eds",
+        "tipo": "select",
+        "id": "pais",
+        "opciones": [
+          "",
+          "Guatemala",
+          "M\u00e9xico",
+          "Colombia"
+        ],
+        "regla": "Debe seleccionar un pa\u00eds"
+      }
+    ],
+    "tecnica": "Particiones de Equivalencia + Valores L\u00edmite",
+    "html_tecnica": "\n<div id=\"tecnica-explicacion\" class=\"box notification is-info is-light mt-5\">\n  <h3 class=\"title is-5\"><i class=\"fas fa-flask\"></i> \u00bfQu\u00e9 t\u00e9cnica usamos aqu\u00ed? \u2192 <strong>Particiones de Equivalencia + L\u00edmites</strong></h3>\n  <p><i class=\"fas fa-check\"></i> Validaci\u00f3n de clases v\u00e1lidas e inv\u00e1lidas:</p>\n  <pre><code>Edad = 17 \u274c (Inv\u00e1lido)\nEdad = 30 \u2705 (V\u00e1lido)\nEdad = 70 \u274c (Inv\u00e1lido)</code></pre>\n  <p><i class=\"fas fa-check\"></i> Evaluamos los l\u00edmites del rango:</p>\n  <pre><code>Edad = 18 \u2705 (L\u00edmite inferior)\nEdad = 60 \u2705 (L\u00edmite superior)\nEdad = 61 \u274c (Fuera de l\u00edmite)</code></pre>\n</div>\n"
+  },
+  {
+    "titulo": "Login con Contrase\u00f1a Segura",
+    "reglas": [
+      "Usuario m\u00ednimo 3 caracteres",
+      "Contrase\u00f1a segura con m\u00ednimo 6 caracteres"
+    ],
+    "campos": [
+      {
+        "label": "Usuario",
+        "tipo": "text",
+        "id": "usuario",
+        "regla": "Debe tener al menos 3 caracteres"
+      },
+      {
+        "label": "Contrase\u00f1a",
+        "tipo": "password",
+        "id": "password",
+        "regla": "Debe tener al menos 6 caracteres"
+      }
+    ],
+    "tecnica": "Tablas de Decisi\u00f3n",
+    "html_tecnica": "\n<div id=\"tecnica-explicacion\" class=\"box notification is-warning is-light mt-5\">\n  <h3 class=\"title is-5\"><i class=\"fas fa-table\"></i> \u00bfQu\u00e9 t\u00e9cnica usamos aqu\u00ed? \u2192 <strong>Tabla de Decisi\u00f3n</strong></h3>\n  <p>Ejemplo de combinaciones posibles:</p>\n  <table class=\"table is-bordered is-striped\">\n    <thead><tr><th>Usuario</th><th>Contrase\u00f1a</th><th>Resultado</th></tr></thead>\n    <tbody>\n      <tr><td>OK</td><td>D\u00e9bil</td><td>\u274c Fallo</td></tr>\n      <tr><td>OK</td><td>Fuerte</td><td>\u2705 Aceptado</td></tr>\n      <tr><td>Corto</td><td>Fuerte</td><td>\u274c Fallo</td></tr>\n    </tbody>\n  </table>\n</div>\n"
+  },
+  {
+    "titulo": "Formulario de Contacto",
+    "reglas": [
+      "Nombre no vac\u00edo",
+      "Correo con formato v\u00e1lido",
+      "Mensaje m\u00ednimo 10 caracteres"
+    ],
+    "campos": [
+      {
+        "label": "Nombre",
+        "tipo": "text",
+        "id": "nombre",
+        "regla": "Campo obligatorio"
+      },
+      {
+        "label": "Correo",
+        "tipo": "text",
+        "id": "correo",
+        "regla": "Debe tener formato v\u00e1lido"
+      },
+      {
+        "label": "Mensaje",
+        "tipo": "textarea",
+        "id": "mensaje",
+        "regla": "Debe tener al menos 10 caracteres"
+      }
+    ],
+    "tecnica": "Combinaci\u00f3n de T\u00e9cnicas",
+    "html_tecnica": "\n<div id=\"tecnica-explicacion\" class=\"box notification is-success is-light mt-5\">\n  <h3 class=\"title is-5\"><i class=\"fas fa-layer-group\"></i> \u00bfQu\u00e9 t\u00e9cnica usamos aqu\u00ed? \u2192 <strong>Combinaci\u00f3n de M\u00e9todos</strong></h3>\n  <ul>\n    <li><i class=\"fas fa-check\"></i> Particiones de Equivalencia: campos obligatorios</li>\n    <li><i class=\"fas fa-check\"></i> Expresiones Regulares: validaci\u00f3n de email</li>\n    <li><i class=\"fas fa-check\"></i> Reglas de negocio: mensaje m\u00ednimo 10 caracteres</li>\n  </ul>\n</div>\n"
+  },
+  {
+    "titulo": "Compra en L\u00ednea",
+    "reglas": [
+      "Cantidad entre 1 y 100",
+      "Producto obligatorio"
+    ],
+    "campos": [
+      {
+        "label": "Producto",
+        "tipo": "select",
+        "id": "producto",
+        "opciones": [
+          "",
+          "Laptop",
+          "Mouse",
+          "Teclado"
+        ],
+        "regla": "Campo obligatorio."
+      },
+      {
+        "label": "Cantidad",
+        "tipo": "number",
+        "id": "cantidad",
+        "regla": "Debe estar entre 1 y 100."
+      }
+    ],
+    "tecnica": "Particiones de Equivalencia + Valores L\u00edmite",
+    "html_tecnica": "\n<div id=\"tecnica-explicacion\" class=\"box notification is-primary is-light mt-5\">\n  <h3 class=\"title is-5\"><i class=\"fas fa-cubes\"></i> \u00bfQu\u00e9 t\u00e9cnica usamos aqu\u00ed? \u2192 <strong>Particiones de Equivalencia + L\u00edmites</strong></h3>\n  <pre><code>Cantidad = 0 \u274c (Inv\u00e1lido)\nCantidad = 1 \u2705 (V\u00e1lido m\u00ednimo)\nCantidad = 100 \u2705 (V\u00e1lido m\u00e1ximo)\nCantidad = 101 \u274c (Inv\u00e1lido)</code></pre>\n</div>\n"
+  },
+  {
+    "titulo": "Registro de Usuario",
+    "reglas": [
+      "Usuario alfanum\u00e9rico",
+      "Correo v\u00e1lido",
+      "Edad m\u00ednima 13"
+    ],
+    "campos": [
+      {
+        "label": "Usuario",
+        "tipo": "text",
+        "id": "usuario",
+        "regla": "Debe ser alfanum\u00e9rico."
+      },
+      {
+        "label": "Correo",
+        "tipo": "text",
+        "id": "correo",
+        "regla": "Debe tener formato v\u00e1lido."
+      },
+      {
+        "label": "Edad",
+        "tipo": "number",
+        "id": "edad",
+        "regla": "M\u00ednimo 13 a\u00f1os."
+      }
+    ],
+    "tecnica": "Tabla de Decisi\u00f3n",
+    "html_tecnica": "\n<div id=\"tecnica-explicacion\" class=\"box notification is-warning is-light mt-5\">\n  <h3 class=\"title is-5\"><i class=\"fas fa-user-plus\"></i> \u00bfQu\u00e9 t\u00e9cnica usamos aqu\u00ed? \u2192 <strong>Tabla de Decisi\u00f3n</strong></h3>\n  <p>Evaluamos m\u00faltiples condiciones simult\u00e1neamente:</p>\n  <table class=\"table is-bordered is-striped\">\n    <thead><tr><th>Usuario</th><th>Correo</th><th>Edad</th><th>Resultado</th></tr></thead>\n    <tbody>\n      <tr><td>OK</td><td>OK</td><td>12</td><td>\u274c</td></tr>\n      <tr><td>OK</td><td>Malo</td><td>15</td><td>\u274c</td></tr>\n      <tr><td>OK</td><td>OK</td><td>20</td><td>\u2705</td></tr>\n    </tbody>\n  </table>\n</div>\n"
+  },
+  {
+    "titulo": "Solicitud de Cita M\u00e9dica",
+    "reglas": [
+      "Nombre no vac\u00edo",
+      "Fecha futura",
+      "Especialidad obligatoria"
+    ],
+    "campos": [
+      {
+        "label": "Nombre completo",
+        "tipo": "text",
+        "id": "nombre",
+        "regla": "Campo obligatorio."
+      },
+      {
+        "label": "Fecha de cita",
+        "tipo": "date",
+        "id": "fecha",
+        "regla": "Debe ser futura."
+      },
+      {
+        "label": "Especialidad",
+        "tipo": "select",
+        "id": "especialidad",
+        "opciones": [
+          "",
+          "Pediatr\u00eda",
+          "Cardiolog\u00eda",
+          "Dermatolog\u00eda"
+        ],
+        "regla": "Seleccione una opci\u00f3n."
+      }
+    ],
+    "tecnica": "Particiones + Transici\u00f3n de Estados",
+    "html_tecnica": "\n<div id=\"tecnica-explicacion\" class=\"box notification is-info is-light mt-5\">\n  <h3 class=\"title is-5\"><i class=\"fas fa-calendar-check\"></i> \u00bfQu\u00e9 t\u00e9cnica usamos aqu\u00ed? \u2192 <strong>Equivalencias + Transici\u00f3n de Estados</strong></h3>\n  <pre><code>Fecha = Hoy \u274c (No v\u00e1lido)\nFecha = Ma\u00f1ana \u2705 (V\u00e1lido)</code></pre>\n</div>\n"
+  }
+];
 
-        <label>Edad:</label>
-        <input type="number" id="edad" required>
 
-        <label>País:</label>
-        <select id="pais" required>
-            <option value="">--Selecciona--</option>
-            <option>México</option>
-            <option>Perú</option>
-            <option>Argentina</option>
-            <option>Chile</option>
-        </select>
+function generarFormulario(campos) {
+  const form = document.getElementById("formulario");
+  form.innerHTML = "";
+  campos.forEach(campo => {
+    const field = document.createElement("div");
+    field.className = "field";
+    const label = document.createElement("label");
+    label.className = "label";
+    label.textContent = campo.label;
+    field.appendChild(label);
+    let input;
+    if (campo.tipo === "select") {
+      input = document.createElement("select");
+      input.className = "select";
+      input.id = campo.id;
+      campo.opciones.forEach(op => {
+        const option = document.createElement("option");
+        option.value = op;
+        option.textContent = op === "" ? "-- Seleccione --" : op;
+        input.appendChild(option);
+      });
+    } else if (campo.tipo === "textarea") {
+      input = document.createElement("textarea");
+      input.className = "textarea";
+      input.id = campo.id;
+    } else {
+      input = document.createElement("input");
+      input.className = "input";
+      input.type = campo.tipo;
+      input.id = campo.id;
+    }
+    field.appendChild(input);
+    form.appendChild(field);
+  });
+}
 
-        <label><input type="checkbox" id="terminos"> Acepto los términos y condiciones</label><br><br>
+function validarFormulario() {
+  const resultado = document.getElementById("resultado");
+  resultado.innerHTML = "";
+  let valido = true;
+  escenarioActual.campos.forEach(campo => {
+    const valor = document.getElementById(campo.id).value.trim();
+    if (
+      (campo.tipo === "text" || campo.tipo === "textarea") && valor === "" ||
+      (campo.tipo === "select" && valor === "") ||
+      (campo.tipo === "number" && (isNaN(valor) || valor === "")) ||
+      (campo.tipo === "date" && new Date(valor) <= new Date())
+    ) {
+      valido = false;
+    }
+  });
+  resultado.className = "notification mt-3 " + (valido ? "is-success" : "is-danger");
+  resultado.innerHTML = valido ? "<i class='fas fa-check-circle'></i> ¡Todo está correcto!" : "<i class='fas fa-exclamation-triangle'></i> Hay errores. Revisa los campos.";
+}
 
-        <button type="submit">Enviar</button>
-    </form>
+let escenarioActual;
+function generarEscenario() {
+  const random = Math.floor(Math.random() * escenarios.length);
+  const escenario = escenarios[random];
+  escenarioActual = escenario;
+  document.getElementById("escenario-titulo").innerText = escenario.titulo;
+  document.getElementById("reglas").innerHTML = "<ul>" + escenario.reglas.map(r => "<li><i class='fas fa-check'></i> " + r + "</li>").join("") + "</ul>";
+  generarFormulario(escenario.campos);
+  document.getElementById("contenedor-tecnica").innerHTML = escenario.html_tecnica || "";
+  document.getElementById("resultado").innerHTML = "";
+  document.getElementById("resultado").className = "notification is-light mt-3";
+}
 
-    <div id="mensaje"></div>
-
-    <script>
-        document.getElementById("test-form").addEventListener("submit", function(e) {
-            e.preventDefault();
-            let errores = [];
-            const usuario = document.getElementById("usuario").value.trim();
-            const password = document.getElementById("password").value;
-            const edad = parseInt(document.getElementById("edad").value);
-            const pais = document.getElementById("pais").value;
-            const terminos = document.getElementById("terminos").checked;
-            const mensaje = document.getElementById("mensaje");
-            mensaje.innerHTML = "";
-
-            if (!/^[a-zA-Z]{3,}$/.test(usuario)) {
-                errores.push("❌ Usuario inválido (mínimo 3 letras, solo letras).");
-            }
-
-            if (!/(?=.*[A-Z])(?=.*\d).{6,}/.test(password)) {
-                errores.push("❌ Contraseña inválida (mínimo 6 caracteres, 1 mayúscula, 1 número).");
-            }
-
-            if (isNaN(edad) || edad < 18 || edad > 60) {
-                errores.push("❌ Edad fuera del rango permitido (18–60).");
-            }
-
-            if (!pais) {
-                errores.push("❌ Debes seleccionar un país.");
-            }
-
-            if (!terminos) {
-                errores.push("❌ Debes aceptar los términos y condiciones.");
-            }
-
-            if (errores.length > 0) {
-                mensaje.innerHTML = "<div class='error'>" + errores.join("<br>") + "</div>";
-            } else {
-                mensaje.innerHTML = "<div class='success'>✔️ Registro exitoso (simulado)</div>";
-            }
-        });
-    </script>
+document.addEventListener("DOMContentLoaded", generarEscenario);
+</script>
 </body>
 </html>
